@@ -1,0 +1,13 @@
+name: Build
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read # raise to write only in the job that uploads a release
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@FULL_COMMIT_SHA # vX.Y.Z
+        with:
+          persist-credentials: false
