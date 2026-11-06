@@ -1,0 +1,25 @@
+innerHTML|outerHTML|insertAdjacentHTML|document\.write|dangerouslySetInnerHTML|v-html|\{@html
+eval\(|new Function|set(Timeout|Interval)\(\s*['"`]
+addEventListener\(\s*['"]message|onmessage\s*=
+localStorage\.clear|sessionStorage\.clear|caches\.delete|indexedDB\.deleteDatabase
+fetch\(|XMLHttpRequest|sendBeacon|new WebSocket
+navigator\.(geolocation|mediaDevices|contacts|clipboard)
+Math\.random
+(api[_-]?key|secret|token|passw(or)?d)\s*[:=]
+AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|github_pat_|sk-[A-Za-z0-9]|AIza[0-9A-Za-z_-]{35}|xox[abprs]-|BEGIN [A-Z ]*PRIVATE KEY
+api\.anthropic\.com|api\.openai\.com|generativelanguage\.googleapis\.com
+claude\.ai/(chat|artifact|code)
+[A-Za-z0-9._%+-]+@(gmail|icloud|me|yahoo|outlook|hotmail)\.com
+/(Users|home)/[A-Za-z0-9._-]+/
+target=["']_blank["']
+pull_request_target|uses:\s*[^@ ]+@(v[0-9][^ ]*|[0-9]+(\.[0-9]+)*|main|master)\s*($|#)
+\$\{\{\s*github\.(head_ref|event\.(issue|pull_request|comment|review|head_commit))
+shell=True|os\.system\(|subprocess\.getoutput|pickle\.loads?\(|yaml\.load\(|curl[^|]*\|\s*(ba|z)?sh
+rm -rf "?\$[A-Za-z_]
+f["'](SELECT|INSERT|UPDATE|DELETE)|["'`](SELECT|INSERT|UPDATE|DELETE)[^"'`]*["'`]\s*\+|(SELECT|INSERT|UPDATE|DELETE)[^"'`]*\$\{
+nodeIntegration:\s*true|contextIsolation:\s*false|webSecurity:\s*false|sandbox:\s*false|allowRunningInsecureContent
+android:debuggable="true"|usesCleartextTraffic="true"|android:allowBackup="true"|addJavascriptInterface|setAllowFileAccess(FromFileURLs)?\(true
+privileged:\s*true|docker\.sock|network_mode:\s*["']?host|cap_add
+image:\s*[^ :@]+(:latest)?\s*$
+^\s*-\s*["']?[0-9]+:[0-9]+
+PermitRootLogin\s+yes|PasswordAuthentication\s+yes|0\.0\.0\.0/0
