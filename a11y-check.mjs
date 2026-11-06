@@ -122,8 +122,15 @@ function report({ url, rules, extras, errors }) {
 const urls = process.argv.slice(2);
 if (!urls.length) { console.log('Usage: node a11y-check.mjs <url> [more urls]'); process.exit(1); }
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--no-sandbox'] });
+let problems = 0;
 try {
-  for (const url of urls) console.log(report(await checkUrl(browser, url)));
+  for (const url of urls) {
+    const result = await checkUrl(browser, url);
+    const extraIssues = result.extras.filter((x) => x.zoomBlocked || x.sidewaysScroll || x.smallTargets.length || x.smallInputs.length).length;
+    problems += result.rules.size + extraIssues + result.errors.size;
+    console.log(report(result));
+  }
 } finally {
   await browser.close();
 }
+process.exit(problems ? 1 : 0); // 0 only when every page is clean
