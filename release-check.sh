@@ -5,16 +5,24 @@
 # Prints one PASS / FAIL / REVIEW / SKIP line per check, short details only for problems,
 # and keeps the full output in a log folder.
 #
-# Usage: bash /tmp/toolkit/release-check.sh [app folder] [extra page ...]
+# Usage: bash /tmp/toolkit/release-check.sh [app folder] [extra page ...] [--click "selector" ...]
 #   app folder  defaults to the current folder (an app repo with index.html at the top)
 #   extra page  more pages for the accessibility check, e.g. "index.html#plan" (index.html is always checked)
+#   --click     one more accessibility pass on index.html with that element pressed first (to open a sheet,
+#               e.g. --click 'button.add[data-open=backup]'). Repeat it for more sheets; each is its own pass.
 # Exits 0 when nothing failed (leads marked REVIEW still need a look), 1 when anything failed.
 set -uo pipefail
 
 TK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP="$(cd "${1:-.}" && pwd)" || { echo "No such folder: ${1:-.}"; exit 1; }
 shift || true
-EXTRA_PAGES=("$@")
+EXTRA_PAGES=(); SHEETS=()
+while [ $# -gt 0 ]; do
+  if [ "$1" = "--click" ]; then
+    [ -n "${2:-}" ] || { echo "--click needs a selector"; exit 1; }
+    SHEETS+=("$2"); shift 2
+  else EXTRA_PAGES+=("$1"); shift; fi
+done
 LOGS="$(mktemp -d /tmp/release-check.XXXXXX)"
 CHROME="${CHROME:-/usr/bin/google-chrome}"
 export CHROME
@@ -93,6 +101,17 @@ else
     fail "accessibility" "$( { grep -E '^===|^- \[|^Errors' "$LOGS/a11y.txt"
       grep -E 'tap target|under 16px|zoom is blocked|scrolls sideways' "$LOGS/a11y.txt" | sed -E 's/^[^:]+: //' | sort -u | sed 's/^/(some sizes) /'; } | sed "s#$BASE/##" | head -15)"
   fi
+  # One extra pass per --click: the same checker on index.html with that element pressed first
+  n=0
+  for sel in "${SHEETS[@]+"${SHEETS[@]}"}"; do
+    n=$((n + 1))
+    if node "$TK/a11y-check.mjs" --click "$sel" "$BASE/index.html" >"$LOGS/a11y-click$n.txt" 2>&1; then
+      pass "accessibility with $sel pressed: nothing found, 4 sizes, light and dark"
+    else
+      fail "accessibility with $sel pressed" "$( { grep -E '^- \[|^Errors' "$LOGS/a11y-click$n.txt"
+        grep -E 'tap target|under 16px|zoom is blocked|scrolls sideways' "$LOGS/a11y-click$n.txt" | sed -E 's/^[^:]+: //' | sort -u | sed 's/^/(some sizes) /'; } | head -15)"
+    fi
+  done
 fi
 
 # ---- 5. Security search patterns on what changed since the last tag ----------
