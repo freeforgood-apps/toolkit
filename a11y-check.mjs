@@ -33,8 +33,9 @@ function extraChecks() {
   const targets = 'button, a[href], input, select, textarea, summary, [role=button], [role=tab], [role=switch], [role=checkbox], [role=radio], [tabindex]:not([tabindex="-1"])';
   for (const el of document.querySelectorAll(targets)) {
     if (el.tagName === 'A' && el.closest('p, li')) continue; // links inside a sentence are exempt
-    // A checkbox or radio counts by its label, which is what people tap
-    const box = ['checkbox', 'radio'].includes(el.type) && el.labels && el.labels[0] ? el.labels[0] : el;
+    // A checkbox, radio or file input counts by its label, which is what people tap
+    // (a file input is often hidden behind its label; one with no label is measured itself)
+    const box = ['checkbox', 'radio', 'file'].includes(el.type) && el.labels && el.labels[0] ? el.labels[0] : el;
     if (!shown(box)) continue;
     const r = box.getBoundingClientRect();
     if (r.width < 44 || r.height < 44) out.smallTargets.push(`${name(box)} (${Math.round(r.width)}×${Math.round(r.height)})`);
