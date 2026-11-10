@@ -1,5 +1,5 @@
 // Accessibility check: axe-core plus checks axe doesn't do, at 4 sizes in light and dark mode.
-// Usage: node a11y-check.mjs <url> [more urls]   (set CHROME to the browser path if it isn't /usr/bin/google-chrome)
+// Usage: node a11y-check.mjs [--click "selector"]... <url> [more urls]   (set CHROME to the browser path if it isn't /usr/bin/google-chrome)
 import puppeteer from 'puppeteer-core';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -48,7 +48,7 @@ function extraChecks() {
   return out;
 }
 
-async function checkUrl(browser, url) {
+async function checkUrl(browser, url, clicks = []) {
   const rules = new Map(), extras = [], errors = new Set();
   for (const view of VIEWS) {
     for (const theme of THEMES) {
@@ -65,6 +65,12 @@ async function checkUrl(browser, url) {
       try {
         await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
         await new Promise((done) => setTimeout(done, 600));
+        // --click: open a sheet or screen first. Clicks the first match in the page, even if it sits on a hidden screen.
+        for (const sel of clicks) {
+          const hit = await page.evaluate((s) => { const e = document.querySelector(s); if (e) e.click(); return !!e; }, sel);
+          if (!hit) throw new Error(`--click "${sel}" matched nothing`);
+          await new Promise((done) => setTimeout(done, 800));
+        }
         await page.addScriptTag({ content: AXE });
         const res = await page.evaluate((tags) => axe.run(document, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] }), TAGS);
         for (const v of res.violations) {
@@ -120,13 +126,18 @@ function report({ url, rules, extras, errors }) {
   return lines.join('\n');
 }
 
-const urls = process.argv.slice(2);
-if (!urls.length) { console.log('Usage: node a11y-check.mjs <url> [more urls]'); process.exit(1); }
+// Arguments: [--click "css selector"]... <url> [more urls]. Each --click is pressed (in order) before the scan, on every url.
+const urls = [], clicks = [];
+const args = process.argv.slice(2);
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--click') { if (!args[i + 1]) { console.log('--click needs a selector'); process.exit(1); } clicks.push(args[++i]); } else urls.push(args[i]);
+}
+if (!urls.length) { console.log('Usage: node a11y-check.mjs [--click "selector"]... <url> [more urls]'); process.exit(1); }
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--no-sandbox'] });
 let problems = 0;
 try {
   for (const url of urls) {
-    const result = await checkUrl(browser, url);
+    const result = await checkUrl(browser, url, clicks);
     const extraIssues = result.extras.filter((x) => x.zoomBlocked || x.sidewaysScroll || x.smallTargets.length || x.smallInputs.length).length;
     problems += result.rules.size + extraIssues + result.errors.size;
     console.log(report(result));
