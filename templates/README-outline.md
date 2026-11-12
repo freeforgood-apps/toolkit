@@ -84,6 +84,8 @@ REPLACE-ME
 
 ## Feedback
 
+<!-- An app with no feedback address (like one shared among friends and family) drops the Email and GitHub lines,
+     says who to tell instead, and points to the self-test report. -->
 Spotted a mistake, got stuck or have an idea? You don't need an account to reach us.
 
 - **Email:** REPLACE-ME (private, no account needed)
@@ -94,11 +96,13 @@ REPLACE-ME app name is a one-person volunteer project, so replies can take a whi
 
 ## Terms of use
 
+<!-- Copy the app's own terms. An app with no terms yet drops this section until its About screen has them. -->
 Free to use. Provided "as is," without warranties of any kind. REPLACE-ME <!-- the app's own "not advice" or "not a guarantee" line -->
 
 ## Files
 
-<!-- Every file at the top of the repo, one row each (icons can share a row). -->
+<!-- Every file at the top of the repo, one row each (icons, and tests, can share a row). A live-data app also lists
+     its fetch script and publish steps, and says its data file lives only on the website. -->
 | File | What it does |
 |---|---|
 | `index.html` | The whole app in one file (about REPLACE-ME KB) |
@@ -115,6 +119,8 @@ Free to use. Provided "as is," without warranties of any kind. REPLACE-ME <!-- t
 
 ## Updating the app
 
+<!-- A live-data app is published by its Publish workflow, not from the branch: say so here, and drop the
+     "within a minute or two" line. -->
 Follow [`how-to-update.md`](how-to-update.md), then upload the new files to this repository and commit. GitHub Pages updates the site within a minute or two, and everyone's saved REPLACE-ME carries over. After an update, run the self-test again and add new rows to **Tested on**.
 
 © REPLACE-ME year REPLACE-ME app name
