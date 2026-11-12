@@ -38,6 +38,7 @@ python3 -m http.server 8770 --bind 127.0.0.1
 | `templates/actions-header.yml` | GitHub Actions header with read-only permissions. Swap in each action's real commit SHA. |
 | `templates/gitignore` | Baseline `.gitignore` (keys, env files, build output). |
 | `templates/SECURITY.md` | Baseline `SECURITY.md` for an app repo. |
+| `templates/README-outline.md` | The shared `README.md` for an app repo: the same sections, in the same order, as Till Payday's and Study Coach's. Copy it in as `README.md`, fill each section from the app's own words and `CHANGELOG.md`, replace every `REPLACE-ME` until `grep -ni replace-me README.md` finds nothing, and delete the `<!-- -->` notes. |
 | `templates/cloudflare-site/` | A starter for a site of mine on Cloudflare Workers (project type 10, cloudflare-basics): `wrangler.jsonc` (workers.dev on, `preview_urls` off, both written out), `package.json` and `package-lock.json` with wrangler pinned, `public/` with a locked `index.html`, `404.html`, `accessibility.html`, `style.css` and `_headers`, a `gitignore`, and the Tag new versions workflow reading `public/index.html`. To use it, copy the folder's contents (dot folders too) into the new repo, rename `gitignore` to `.gitignore`, replace every `REPLACE-ME` until `grep -rni replace-me . --exclude-dir=node_modules` finds nothing (the `-i` matters: the names in `wrangler.jsonc`, `package.json` and `package-lock.json` have to be lowercase, so they read `replace-me`), and run `lock.py` on any page whose script changes. |
 
 ## Versions
