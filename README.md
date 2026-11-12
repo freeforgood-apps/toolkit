@@ -38,13 +38,18 @@ python3 -m http.server 8770 --bind 127.0.0.1
 | `templates/actions-header.yml` | GitHub Actions header with read-only permissions. Swap in each action's real commit SHA. |
 | `templates/gitignore` | Baseline `.gitignore` (keys, env files, build output). |
 | `templates/SECURITY.md` | Baseline `SECURITY.md` for an app repo. |
+| `templates/cloudflare-site/` | A starter for a site of mine on Cloudflare Workers (project type 10, cloudflare-basics): `wrangler.jsonc` (workers.dev on, `preview_urls` off, both written out), `package.json` and `package-lock.json` with wrangler pinned, `public/` with a locked `index.html`, `404.html`, `accessibility.html`, `style.css` and `_headers`, a `gitignore`, and the Tag new versions workflow reading `public/index.html`. To use it, copy the folder's contents (dot folders too) into the new repo, rename `gitignore` to `.gitignore`, replace every `REPLACE-ME` until `grep -rn REPLACE-ME .` finds nothing, and run `lock.py` on any page whose script changes. |
 
 ## Versions
 
 Dependencies are pinned exactly (`puppeteer-core` 25.16.0, `axe-core` 4.14.0) and locked in `package-lock.json`. Update them on purpose, then re-run every tool on a real app before committing.
+
+The Cloudflare site starter pins `wrangler` 4.160.1 in its own `package.json` and lock (not the toolkit's), with `compatibility_date` 2026-11-10, the newest its runtime supports. Update them together on purpose, then rerun `bash tests/cloudflare-site.test.sh` and the starter checks below.
 
 `release-check.sh` was tested on Till Payday 1.1.6: all five checks passed (about 26 seconds). On a copy with problems planted on purpose (an out-of-date lock, a wrong `sw.js` version, an unlabeled 12px input, a fake key and an `insertAdjacentHTML` call), it failed versions, lock and accessibility and listed the planted line as a lead.
 
 `push-check.sh` has its own tests: `bash tests/push-check.test.sh` makes made-up repos in a temp folder (no network) and runs a clean change, `--push` and the guard hook, `--all`, and 28 planted-mistake checks (wrong org, a remote that moved, wrong or non-noreply authors, a changed or unsigned committer, local time zones, Claude links, and the other side's words in files, names, messages, binary files, other spellings and removed lines). With bugs planted in copies of the script (the dates check, binary files, bot authors), the tests caught each one. Its word matching is loose on purpose (any case, with or without spaces, dots, hyphens or underscores), so a lookalike can FAIL: reword it, or make sure it isn't the other side. It can't see inside compressed files like zips.
 
 The other tools were tested on Till Payday 1.1.6: self-test passed at all three sizes (286 checks each), accessibility check found nothing, and `lock.py` left the live files unchanged.
+
+`templates/cloudflare-site/` has its own test: `bash tests/cloudflare-site.test.sh` (no network) checks its settings, pinned versions, lock, headers and pages, and that it stays in step with the other templates. Nine mistakes planted on purpose (preview URLs on, a loose wrangler version, a stale lock, a missing ignore line, the wrong tag path, versions out of step, zoom blocked, broad workflow permissions, a page allowed to fetch) were each caught. The starter itself was tested with wrangler 4.160.1: `wrangler deploy --dry-run` read its 5 files with no bindings, `wrangler dev` served every page (a missing page got `404.html` with a 404 status, and all four headers were on every response), and `release-check.sh public` passed, with the accessibility checker clean on all three pages at 4 sizes in light and dark.

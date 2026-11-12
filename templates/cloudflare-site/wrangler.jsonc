@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "replace-me",
+  "compatibility_date": "2026-11-10",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  },
+  // workers.dev is this site's address. Set it to false once the site has its own domain.
+  "workers_dev": true,
+  // Always written out: if it's left out, Wrangler keeps whatever was set before.
+  "preview_urls": false
+}
